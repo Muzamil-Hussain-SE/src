@@ -4,6 +4,7 @@ int main()
 {
     int ballX = 300;
     int ballY = 300;
+    Color green = {20, 160, 133, 255};
 
     InitWindow(600, 600, "New Game");
     SetTargetFPS(60);
@@ -11,12 +12,28 @@ int main()
     // Game loop
     while (WindowShouldClose() == false)
     {
-        ballX += 3;
+
         BeginDrawing();
+        if (IsKeyDown(KEY_RIGHT))
+        {
+            ballX += 3;
+        }
+        else if (IsKeyDown(KEY_LEFT))
+        {
+            ballX -= 3;
+        }
+        else if (IsKeyDown(KEY_DOWN))
+        {
+            ballY += 3;
+        }
+        else if (IsKeyDown(KEY_UP))
+        {
+            ballY -= 3;
+        }
         // DrawCircle(280,160,13,WHITE);
         // DrawRectangle(270,170,20,120,WHITE);
         // DrawCircle(260,300,20,WHITE);
-        ClearBackground(BLACK);
+        ClearBackground(green);
         DrawCircle(ballX, ballY, 20, WHITE);
 
         EndDrawing();
