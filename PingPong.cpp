@@ -1,0 +1,23 @@
+#include <bits/stdc++.h>
+#include <raylib.h>
+using namespace std;
+int main()
+{
+    cout<<"Starting the game...\n";
+    const int screen_height = 1200;
+    const int screen_width = 800;
+    InitWindow(screen_width,screen_height,"Ping Pong"); //creating window
+    SetTargetFPS(60);
+    
+    while(WindowShouldClose()==false)       //GameLoop
+    {
+        BeginDrawing();
+        DrawCircle(screen_width/2,screen_height/2,10,WHITE);
+
+        EndDrawing();
+    }
+
+
+    CloseWindow();      //closing window
+    return 0;
+}

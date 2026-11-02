@@ -15,7 +15,7 @@ int main()
 
         BeginDrawing();
         if (IsKeyDown(KEY_RIGHT))
-        {
+        { 
             ballX += 3;
         }
         else if (IsKeyDown(KEY_LEFT))
