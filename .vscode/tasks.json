@@ -3,28 +3,26 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build Raylib Game",
-            "type": "shell",
-            "command": "C:/msys64/ucrt64/bin/g++.exe",
+            "type": "cppbuild",
+            "label": "Build Raylib",
+            "command": "C:/raylib/w64devkit/bin/g++.exe",
             "args": [
                 "-Wall",
                 "-Wextra",
                 "-g3",
-                "${workspaceFolder}/main.cpp",
-                "${workspaceFolder}/ball.cpp",
-                "-o",
-                "${workspaceFolder}/output/main.exe",
                 "-I",
                 "C:/raylib/raylib/src",
+                "${file}",
+                "-o",
+                "${fileDirname}/output/${fileBasenameNoExtension}.exe",
                 "-L",
                 "C:/raylib/raylib/src",
                 "-lraylib",
-                "-lopengl32",
                 "-lgdi32",
                 "-lwinmm"
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${fileDirname}"
             },
             "problemMatcher": ["$gcc"],
             "group": {

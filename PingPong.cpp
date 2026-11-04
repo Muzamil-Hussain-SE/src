@@ -4,7 +4,7 @@ using namespace std;
 int main()
 {
     cout<<"Starting the game...\n";
-    const int screen_height = 1200;
+    const int screen_height = 600;
     const int screen_width = 800;
     InitWindow(screen_width,screen_height,"Ping Pong"); //creating window
     SetTargetFPS(60);
@@ -13,6 +13,8 @@ int main()
     {
         BeginDrawing();
         DrawCircle(screen_width/2,screen_height/2,10,WHITE);
+        DrawRectangle(8,screen_height/2 - 60,25,120,WHITE);
+        DrawRectangle(screen_width-33,screen_height/2 - 60,25,120,WHITE);
 
         EndDrawing();
     }
