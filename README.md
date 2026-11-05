@@ -1,44 +1,104 @@
-# Ping Pong (raylib)
+# 🎮 Ping Pong Game
 
-A small two-paddle Pong game written in C++ with [raylib](https://www.raylib.com/). Play against a CPU-controlled paddle and try to keep the ball in play.
+<div align="center">
 
-## Features
+<img src="https://img.shields.io/badge/C%2B%2B-17-00599C?style=for-the-badge&logo=c%2B%2B" alt="C++" />
+<img src="https://img.shields.io/badge/raylib-3.7-6B8E23?style=for-the-badge" alt="raylib" />
+<img src="https://img.shields.io/badge/Status-Playable-4CAF50?style=for-the-badge" alt="Playable" />
 
-- 800 × 600 game window running at 60 FPS
-- Player-controlled paddle and a simple CPU opponent
-- Ball and paddle collisions, wall bounces, and score tracking
-- A green court with a center line and circle
+A colorful, fast-paced Pong arcade game built with C++ and raylib.
 
-## Controls
+</div>
+
+## ✨ Overview
+
+This project is a small but polished arcade-style ping pong game where a player faces a CPU-controlled opponent in a two-paddle match. The game includes score tracking, collision detection, velocity-based ball movement, and a clean retro-styled UI.
+
+## 🕹️ Gameplay
+
+- Move your paddle up and down using the keyboard
+- Compete against a simple AI opponent
+- Score points by getting the ball past the opponent
+- Keep the rally going and win the match
+
+## 🎯 Features
+
+- Smooth 60 FPS gameplay
+- Player vs CPU mode
+- Real-time collision handling
+- Score system
+- Center court and visual divider
+- Simple, responsive controls
+- Built using raylib for lightweight graphics
+
+## 🕹️ Controls
 
 | Key | Action |
 | --- | --- |
-| **Up Arrow** | Move the player paddle up |
-| **Down Arrow** | Move the player paddle down |
-| **Esc** | Close the game window |
+| ↑ / W | Move paddle up |
+| ↓ / S | Move paddle down |
+| Esc | Exit the game |
 
-## Requirements
+## 🧰 Requirements
 
-- A C++ compiler with C++ support
-- raylib installed and available to your compiler and linker
+Before building the game, make sure you have:
 
-## Build and run
+- C++ compiler
+- raylib installed
+- OpenGL support on your system
 
-The main Pong implementation is in `PingPong.cpp`. With raylib installed, a MinGW-w64/GCC build on Windows can be made with:
+## 🚀 Build Instructions
 
-```sh
+### Windows (MinGW / g++)
+
+```bash
 g++ PingPong.cpp -o PingPong.exe -lraylib -lopengl32 -lgdi32 -lwinmm
 ```
 
-If raylib is installed in a nonstandard location, add its include and library directories with `-I` and `-L` options. On other platforms, use the appropriate raylib linker dependencies for your compiler and operating system.
+Then run:
 
-Then launch `PingPong.exe` (or the executable produced by your platform's build command).
+```bash
+./PingPong.exe
+```
 
-## Project files
+### Linux
 
-- `PingPong.cpp` — Pong game, including the ball, paddles, CPU behavior, and scoring.
-- `main.cpp`, `ball.cpp`, and `ball.h` — additional/simple ball-game source files in the repository; they are separate from the self-contained Pong implementation above.
+```bash
+g++ PingPong.cpp -o PingPong -lraylib -lm -ldl -lpthread
+./PingPong
+```
 
-## How to play
+### macOS
 
-Move the right-side paddle with the Up and Down Arrow keys. The CPU controls the left-side paddle. Each time the ball passes a paddle and exits the screen, the opposing side's score increases and the ball returns to the center.
+```bash
+g++ PingPong.cpp -o PingPong -framework OpenGL -framework Cocoa -framework IOKit -lraylib
+./PingPong
+```
+
+> If raylib is not installed globally, add the correct include and library paths for your environment.
+
+## 📁 Project Structure
+
+```text
+src/
+├── PingPong.cpp     # Main game implementation
+├── main.cpp         # Extra raylib test/demo file
+├── ball.h           # Ball class declaration
+├── ball.cpp         # Ball class implementation
+├── README.md        # Project documentation
+├── game.exe         # Built Windows executable
+├── main.exe         # Extra built executable
+└── output/          # Output folder
+```
+
+## 🏗️ Notes
+
+The main playable game logic is implemented in `PingPong.cpp`. The other files in the project are supporting or experimental examples related to raylib and ball movement.
+
+## 📌 Goal
+
+The objective is simple: beat the CPU and keep the ball out of your goal as long as possible.
+
+---
+
+Made with ❤️ and raylib.
