@@ -26,7 +26,7 @@ int main()
         }
         if (y >= height)
         {
-            y = 1;
+            y = 0;
         }
 
         if (x >= width)
