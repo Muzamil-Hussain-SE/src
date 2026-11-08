@@ -1,121 +1,234 @@
-#include <bits/stdc++.h>
 #include <raylib.h>
-using namespace std;
+
+#include <algorithm>
+#include <cmath>
+
+namespace
+{
+constexpr int screenWidth = 800;
+constexpr int screenHeight = 600;
+constexpr float paddleWidth = 14.0f;
+constexpr float paddleHeight = 112.0f;
+constexpr float paddleSpeed = 460.0f;
+constexpr float maxBallSpeed = 700.0f;
+
+const Color background = {12, 18, 38, 255};
+const Color courtGreen = {18, 30, 55, 255};
+const Color dividerColor = {91, 112, 150, 100};
+const Color leftColor = {72, 220, 190, 255};
+const Color rightColor = {255, 190, 80, 255};
+
+struct Paddle
+{
+    Rectangle bounds;
+    Color color;
+};
+
+struct Ball
+{
+    Vector2 position;
+    Vector2 velocity;
+    float radius;
+    float serveTimer;
+    float serveDirection;
+};
+
+void KeepPaddleOnScreen(Paddle& paddle)
+{
+    paddle.bounds.y = std::clamp(paddle.bounds.y, 0.0f, screenHeight - paddle.bounds.height);
+}
+
+void ResetBall(Ball& ball, float direction)
+{
+    ball.position = {screenWidth / 2.0f, screenHeight / 2.0f};
+    ball.velocity = {0.0f, 0.0f};
+    ball.serveTimer = 0.8f;
+    ball.serveDirection = direction;
+}
+
+void ServeBall(Ball& ball)
+{
+    const float speed = 390.0f;
+    const float verticalSpeed = static_cast<float>(GetRandomValue(-180, 180));
+    ball.velocity = {ball.serveDirection * speed, verticalSpeed};
+}
+
+void BounceOffPaddle(Ball& ball, const Paddle& paddle, bool movingRight)
+{
+    const float hitPosition = std::clamp(
+        (ball.position.y - (paddle.bounds.y + paddle.bounds.height / 2.0f)) /
+            (paddle.bounds.height / 2.0f),
+        -1.0f,
+        1.0f);
+    const float currentSpeed = std::sqrt(
+        ball.velocity.x * ball.velocity.x + ball.velocity.y * ball.velocity.y);
+    const float newSpeed = std::min(currentSpeed * 1.04f, maxBallSpeed);
+    const float angle = hitPosition * 1.04719755f;
+    const float horizontalSpeed = newSpeed * std::cos(angle);
+
+    ball.velocity.x = movingRight ? horizontalSpeed : -horizontalSpeed;
+    ball.velocity.y = newSpeed * std::sin(angle);
+
+    if (movingRight)
+    {
+        ball.position.x = paddle.bounds.x + paddle.bounds.width + ball.radius;
+    }
+    else
+    {
+        ball.position.x = paddle.bounds.x - ball.radius;
+    }
+}
+
+void DrawCourt()
+{
+    ClearBackground(background);
+    DrawRectangle(0, 0, screenWidth / 2, screenHeight, courtGreen);
+
+    for (int y = 16; y < screenHeight; y += 30)
+    {
+        DrawRectangle(screenWidth / 2 - 2, y, 4, 16, dividerColor);
+    }
+
+    DrawCircleLines(screenWidth / 2, screenHeight / 2, 88.0f, dividerColor);
+    DrawCircle(screenWidth / 2, screenHeight / 2, 4.0f, dividerColor);
+    DrawRectangleLinesEx(
+        Rectangle{8.0f, 8.0f, screenWidth - 16.0f, screenHeight - 16.0f},
+        2.0f,
+        Color{91, 112, 150, 100});
+}
+
+void DrawPaddle(const Paddle& paddle)
+{
+    Rectangle shadow = paddle.bounds;
+    shadow.x += 4.0f;
+    shadow.y += 5.0f;
+    DrawRectangleRounded(shadow, 0.7f, 8, Color{0, 0, 0, 80});
+    DrawRectangleRounded(paddle.bounds, 0.7f, 8, paddle.color);
+}
+
+void DrawScore(int score, int centerX, const char* label, Color color)
+{
+    const int labelWidth = MeasureText(label, 16);
+    DrawText(label, centerX - labelWidth / 2, 24, 16, color);
+
+    const char* scoreText = TextFormat("%02i", score);
+    const int scoreWidth = MeasureText(scoreText, 48);
+    DrawText(scoreText, centerX - scoreWidth / 2, 44, 48, RAYWHITE);
+}
+} // namespace
 
 int main()
 {
-    int p1score = 0;
-    int p2score = 0;
-    int height = 600;
-    int width = 800;
-    InitWindow(800, 600, "Practice");
+    InitWindow(screenWidth, screenHeight, "NEON PONG");
     SetTargetFPS(60);
-    int x1 = 150;
-    int y1 = 200;
-    int x2 = 200;
-    int y2 = 150;
-    Rectangle leftRect = {0, 200, 20, 120};
-    Rectangle rightRect = {(float)width - 20, (float)(height - 400), 20, 120};
-    // int speedx = 5;
-    // int speedy = 5;
-    while (WindowShouldClose() == false)
+
+    Paddle leftPaddle = {
+        {32.0f, screenHeight / 2.0f - paddleHeight / 2.0f, paddleWidth, paddleHeight},
+        leftColor};
+    Paddle rightPaddle = {
+        {screenWidth - 32.0f - paddleWidth, screenHeight / 2.0f - paddleHeight / 2.0f,
+         paddleWidth, paddleHeight},
+        rightColor};
+    Ball ball = {{0.0f, 0.0f}, {0.0f, 0.0f}, 11.0f, 0.0f, 1.0f};
+    int leftScore = 0;
+    int rightScore = 0;
+    ResetBall(ball, 1.0f);
+
+    while (!WindowShouldClose())
     {
-        BeginDrawing();
-
-        ClearBackground(GREEN);
-        DrawCircle(x1, y1, 15, YELLOW);
-        DrawCircle(x2, y2, 15, GRAY);
-        DrawRectangleRounded(rightRect, 0.8, 0, RED);
-        DrawRectangleRounded(Rectangle{leftRect}, 0.8, 0, RED);
-        if (y1 <= 0)
-        {
-
-            y1 = 10;
-        }
-        if (y1 >= height)
-        {
-            y1 = height - 10;
-        }
-
-        if (x1 >= width)
-        {
-            x1 = width - 10;
-            ;
-        }
-        if (x1 <= 0)
-        {
-            x1 = 10;
-        }
+        const float deltaTime = GetFrameTime();
 
         if (IsKeyDown(KEY_W))
         {
-            y1 -= 10;
+            leftPaddle.bounds.y -= paddleSpeed * deltaTime;
         }
         if (IsKeyDown(KEY_S))
         {
-            y1 += 10;
+            leftPaddle.bounds.y += paddleSpeed * deltaTime;
         }
-        if (IsKeyDown(KEY_A))
-        {
-            x1 -= 10;
-        }
-        if (IsKeyDown(KEY_D))
-        {
-            x1 += 10;
-        }
-        if (y2 <= 0)
-        {
-
-            y2 = 10;
-        }
-        if (y2 >= height)
-        {
-            y2 = height - 10;
-        }
-
-        if (x2 >= width)
-        {
-            x2 = width - 10;
-        }
-        if (x2 <= 0)
-        {
-            x2 = 10;
-        }
-
         if (IsKeyDown(KEY_UP))
         {
-            y2 -= 10;
+            rightPaddle.bounds.y -= paddleSpeed * deltaTime;
         }
         if (IsKeyDown(KEY_DOWN))
         {
-            y2 += 10;
+            rightPaddle.bounds.y += paddleSpeed * deltaTime;
         }
-        if (IsKeyDown(KEY_LEFT))
-        {
-            x2 -= 10;
-        }
-        if (IsKeyDown(KEY_RIGHT))
-        {
-            x2 += 10;
-        }
-        if (CheckCollisionCircleRec(Vector2{(float)x2, (float)y2}, 15, leftRect))
-        {
-            p2score++;
-            cout << "Gray ball hit left rectangle!" << endl;
-            x2 = width / 2;
-        }
-        if (CheckCollisionCircleRec(Vector2{(float)x1, (float)y1}, 15, rightRect))
-        {
-            p1score++;
-            cout << "Yellow ball hit right rectangle!" << endl;
-            x1 = width / 2;
-        }
-        DrawText(TextFormat("%i", p1score), width / 4 - 20, 20, 80, WHITE);
-        DrawText(TextFormat("%i", p2score), 3 * width / 4 - 20, 20, 80, WHITE);
+        KeepPaddleOnScreen(leftPaddle);
+        KeepPaddleOnScreen(rightPaddle);
 
+        if (ball.serveTimer > 0.0f)
+        {
+            ball.serveTimer -= deltaTime;
+            if (ball.serveTimer <= 0.0f)
+            {
+                ServeBall(ball);
+            }
+        }
+        else
+        {
+            ball.position.x += ball.velocity.x * deltaTime;
+            ball.position.y += ball.velocity.y * deltaTime;
+
+            if (ball.position.y - ball.radius <= 8.0f)
+            {
+                ball.position.y = 8.0f + ball.radius;
+                ball.velocity.y = std::abs(ball.velocity.y);
+            }
+            else if (ball.position.y + ball.radius >= screenHeight - 8.0f)
+            {
+                ball.position.y = screenHeight - 8.0f - ball.radius;
+                ball.velocity.y = -std::abs(ball.velocity.y);
+            }
+
+            if (ball.velocity.x < 0.0f &&
+                CheckCollisionCircleRec(ball.position, ball.radius, leftPaddle.bounds))
+            {
+                BounceOffPaddle(ball, leftPaddle, true);
+            }
+            else if (ball.velocity.x > 0.0f &&
+                     CheckCollisionCircleRec(ball.position, ball.radius, rightPaddle.bounds))
+            {
+                BounceOffPaddle(ball, rightPaddle, false);
+            }
+
+            if (ball.position.x + ball.radius < 0.0f)
+            {
+                rightScore++;
+                ResetBall(ball, -1.0f);
+            }
+            else if (ball.position.x - ball.radius > screenWidth)
+            {
+                leftScore++;
+                ResetBall(ball, 1.0f);
+            }
+        }
+
+        BeginDrawing();
+        DrawCourt();
+        DrawScore(leftScore, screenWidth / 4, "PLAYER 1", leftColor);
+        DrawScore(rightScore, 3 * screenWidth / 4, "PLAYER 2", rightColor);
+
+        DrawPaddle(leftPaddle);
+        DrawPaddle(rightPaddle);
+        DrawCircleV(
+            Vector2{ball.position.x + 3.0f, ball.position.y + 4.0f},
+            ball.radius + 3.0f,
+            Color{0, 0, 0, 80});
+        DrawCircleV(ball.position, ball.radius, Color{255, 246, 220, 255});
+        DrawCircleV(ball.position, 4.0f, WHITE);
+
+        if (ball.serveTimer > 0.0f)
+        {
+            DrawText("GET READY", screenWidth / 2 - MeasureText("GET READY", 18) / 2,
+                     screenHeight / 2 + 112, 18, Color{190, 205, 230, 220});
+        }
+
+        DrawText("W / S", 24, screenHeight - 30, 14, leftColor);
+        DrawText("UP / DOWN", screenWidth - 108, screenHeight - 30, 14, rightColor);
         EndDrawing();
     }
-    CloseWindow();
 
+    CloseWindow();
     return 0;
 }
