@@ -2,7 +2,7 @@
 
 Dino::Dino()
 {
-    image = LoadTexture("dino.png");
+    image = LoadTexture("dino/dino.png");
     position.x = 100;
     position.y = 100;
 };

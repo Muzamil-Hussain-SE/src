@@ -25,10 +25,48 @@
                 "cwd": "${fileDirname}"
             },
             "problemMatcher": ["$gcc"],
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build Dino",
+            "command": "C:/raylib/w64devkit/bin/g++.exe",
+            "args": [
+                "-Wall",
+                "-Wextra",
+                "-g3",
+                "-I",
+                "C:/raylib/raylib/src",
+                "${workspaceFolder}/dino/main.cpp",
+                "${workspaceFolder}/dino/dino.cpp",
+                "-o",
+                "${workspaceFolder}/dino/output/dino.exe",
+                "-L",
+                "C:/raylib/raylib/src",
+                "-lraylib",
+                "-lopengl32",
+                "-lgdi32",
+                "-lwinmm"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": ["$gcc"],
             "group": {
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "type": "process",
+            "label": "Run Dino",
+            "command": "${workspaceFolder}/dino/output/dino.exe",
+            "dependsOn": "Build Dino",
+            "dependsOrder": "sequence",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
         }
     ]
 }
