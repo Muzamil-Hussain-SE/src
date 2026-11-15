@@ -1,0 +1,174 @@
+#include <raylib.h>
+#include <iostream>
+// #pragma once
+using namespace std;
+
+int main()
+{
+    int counter = 0;
+    InitWindow(1080, 700, "ShooterCpp");
+    InitAudioDevice();
+    Music bgm1 = LoadMusicStream("assets/akatsuki_theme.mp3");
+    int animFrames = 0;
+    // Image logo = LoadImage("assets/logo.png");
+    Image naruto = LoadImage("assets/naruto.png");
+    // Image naruto1 = LoadImage("assets/narutoR1.png");
+    // Image naruto2 = LoadImage("assets/narutoR2.png");
+    // Image narutoAttack1 = LoadImage("assets/narutoP1.png");
+    // Image narutoAttack2 = LoadImage("assets/narutoP2.png");
+    // Image narutoPunch1 = LoadImage("assets/narutoP3.png");
+    // Image narutoPunch2 = LoadImage("assets/narutoP4.png");
+    Texture2D narutoTex = LoadTextureFromImage(naruto);
+    // Texture2D narutoTex1 = LoadTextureFromImage(naruto1);
+    // Texture2D narutoTex2 = LoadTextureFromImage(naruto2);
+    // Texture2D narutoFight1 = LoadTextureFromImage(narutoAttack1);
+    // Texture2D narutoFight2 = LoadTextureFromImage(narutoAttack2);
+    // Texture2D narutoPunchAttack1 = LoadTextureFromImage(narutoPunch1);
+    // Texture2D narutoPunchAttack2 = LoadTextureFromImage(narutoPunch2);
+    
+    int i = 0, j = 1;
+    int p1x = 50;
+    int p1y = 350;
+    bool jumpP1 = false;
+    bool fallingP1 = false;
+    Image animImage = LoadImageAnim("assets/bg.mp4", &animFrames);
+    // Texture2D logotex = LoadTextureFromImage(logo);
+    Texture2D animTexture = LoadTextureFromImage(animImage);
+    unsigned int nextFrameDataOffset = 0;
+    int currentAnimFrame = 0;
+    int frameCounter = 0;
+    int frameDelay = 8;
+    int colorFlag = 0;
+    bool gameStart = false;
+    Rectangle destRec = {0.0f, 0.0f, 1080.0f, 700.0f};
+    Vector2 origin = {0.0f, 0.0f};
+    SetMusicVolume(bgm1, 0.7f);
+    PlayMusicStream(bgm1);
+    SetTargetFPS(60);
+    while (WindowShouldClose() == false)
+    {
+        UpdateMusicStream(bgm1);
+        frameCounter++;
+        if (frameCounter >= frameDelay)
+        {
+            currentAnimFrame++;
+            if (currentAnimFrame >= animFrames)
+                currentAnimFrame = 0;
+            nextFrameDataOffset = animImage.width * animImage.height * 4 * currentAnimFrame;
+
+            // Update the GPU texture with the raw pixel data of the next frame
+            UpdateTexture(animTexture, ((unsigned char *)animImage.data) + nextFrameDataOffset);
+
+            frameCounter = 0;
+        }
+
+        BeginDrawing();
+        if (!gameStart)
+        {
+            if (counter <= 300)
+            {
+                ClearBackground(BLACK);
+                DrawText("A GAME BY", 1080 / 2 - 80, 700 / 2 - 50, 30, WHITE);
+                EndDrawing();
+                counter++;
+                continue;
+            }
+            if (counter >= 300 && counter <= 600)
+            {
+                ClearBackground(BLACK);
+                DrawText("Muzamil Hussain", 1080 / 2 - 200, 700 / 2 - 50, 70, YELLOW);
+                EndDrawing();
+                counter++;
+                continue;
+            }
+            ClearBackground(BLUE);
+            // DrawTexture(animTexture, 1080 / 2 - animTexture.width / 2, 700 / 2 - animTexture.height / 2, WHITE);
+            DrawTexturePro(animTexture, (Rectangle){0.0f, 0.0f, (float)animTexture.width, (float)animTexture.height}, destRec, origin, 0.0f, WHITE);
+            // DrawTexture(logotex, 400, 60, WHITE);
+            DrawText("PRESS P TO START", 400, 580, 30, colorFlag % 10 == 0 ? YELLOW : WHITE);
+            if (IsKeyDown(KEY_P))
+            {
+                gameStart = true;
+                counter = 0;
+            }
+        } else {
+            if(counter <= 200){
+                counter++;
+                ClearBackground(Color{255, 0, 0, 50});
+                DrawText("FIGHT!", 1080/2 - 100, 700/2 - 50, 50, WHITE);
+                EndDrawing(); continue;
+            }
+            DrawTexturePro(animTexture, (Rectangle){0.0f, 0.0f, (float)animTexture.width, (float)animTexture.height}, destRec, origin, 0.0f, WHITE);
+            if(IsKeyDown(KEY_D)){
+                p1x+=10;
+            }
+            if(IsKeyDown(KEY_A)){
+                p1x-=10;
+            }
+            if(IsKeyDown(KEY_SPACE)){
+                jumpP1 = true;
+            }
+
+            if(jumpP1){
+                if(p1y <= 200){
+                    fallingP1 = true;
+                    jumpP1 = false;
+                } else {
+                    p1y-=20;
+
+                }
+            }
+            if(fallingP1){
+                p1y += 50;
+                if(p1y >= 350){
+                    fallingP1 = false;
+                }
+            }
+            
+            if(IsKeyDown(KEY_D) || IsKeyDown(KEY_A)){
+                if(i%10 == 0){
+                    j++;
+                }
+                // if(j % 2 == 0){
+                //     DrawTexture(narutoTex1, p1x, p1y, WHITE);
+                // } else {
+                //     DrawTexture(narutoTex2, p1x, p1y, WHITE);
+                // } i++;
+            } else if(IsKeyDown(KEY_R)){
+                if(i%10 == 0){
+                    j++;
+                }
+                // if(j % 2 == 0){
+                //     DrawTexture(narutoPunchAttack1, p1x, p1y, WHITE);
+                // } else {
+                //     DrawTexture(narutoPunchAttack2, p1x, p1y, WHITE);
+                // } i++;
+            } else if(IsKeyDown(KEY_F)){
+                if(i%10 == 0){
+                    j++;
+                }
+                // if(j % 2 == 0){
+                //     DrawTexture(narutoFight1, p1x, p1y, WHITE);
+                // } else {
+                //     DrawTexture(narutoFight2, p1x, p1y, WHITE);
+                // } i++;
+            } else {
+                DrawTexture(narutoTex, p1x, p1y, WHITE);
+                i = 0; j = 0;
+            }
+        }
+        EndDrawing();
+        if (colorFlag >= 100)
+        {
+            colorFlag = 0;
+        }
+        colorFlag++;
+    }
+    UnloadMusicStream(bgm1);
+    // UnloadTexture(logotex);
+    UnloadTexture(animTexture);
+    // UnloadImage(logo);
+    UnloadImage(animImage);
+    CloseAudioDevice();
+    CloseWindow();
+}
