@@ -1,41 +1,46 @@
 #include <raylib.h>
 #include <iostream>
-// #pragma once
 using namespace std;
 
 int main()
 {
     int counter = 0;
+
     InitWindow(1080, 700, "ShooterCpp");
     InitAudioDevice();
-    Music bgm1 = LoadMusicStream("assets/akatsuki_theme.mp3");
-    int animFrames = 0;
-    // Image logo = LoadImage("assets/logo.png");
-    Image naruto = LoadImage("assets/naruto.png");
-    // Image naruto1 = LoadImage("assets/narutoR1.png");
-    // Image naruto2 = LoadImage("assets/narutoR2.png");
-    // Image narutoAttack1 = LoadImage("assets/narutoP1.png");
-    // Image narutoAttack2 = LoadImage("assets/narutoP2.png");
-    // Image narutoPunch1 = LoadImage("assets/narutoP3.png");
-    // Image narutoPunch2 = LoadImage("assets/narutoP4.png");
-    Texture2D narutoTex = LoadTextureFromImage(naruto);
-    // Texture2D narutoTex1 = LoadTextureFromImage(naruto1);
-    // Texture2D narutoTex2 = LoadTextureFromImage(naruto2);
-    // Texture2D narutoFight1 = LoadTextureFromImage(narutoAttack1);
-    // Texture2D narutoFight2 = LoadTextureFromImage(narutoAttack2);
-    // Texture2D narutoPunchAttack1 = LoadTextureFromImage(narutoPunch1);
-    // Texture2D narutoPunchAttack2 = LoadTextureFromImage(narutoPunch2);
+    SetTargetFPS(60);
 
-    int i = 0;
-    // j = 1;
+    // Background music
+    Music bgm1 = LoadMusicStream("../assets/akatsuki_theme.mp3");
+    SetMusicVolume(bgm1, 0.7f);
+    PlayMusicStream(bgm1);
+
+    // Load characters
+    Texture2D narutoTex = LoadTexture("../assets/naruto.png");
+    Texture2D sasukeTex = LoadTexture("../assets/madara.png");
+
+    // Player 1: Naruto
     int p1x = 50;
     int p1y = 350;
+
+    // Player 2: Sasuke
+    int p2x = 850;
+    int p2y = 350;
+
+    // Character sizes
+    float playerScale = 0.30f;
+
+    // Jump variables
     bool jumpP1 = false;
     bool fallingP1 = false;
-    // Texture2D logotex = LoadTextureFromImage(logo);
-    // Image animImage = LoadImageAnim("assets/bg.gif", &animFrames);
-    // Texture2D animTexture = LoadTextureFromImage(animImage);
-    Image animImage = LoadImageAnim("assets/bg.gif", &animFrames);
+
+    bool jumpP2 = false;
+    bool fallingP2 = false;
+
+    // Animated background
+    int animFrames = 0;
+    Image animImage = LoadImageAnim("../assets/bg.gif", &animFrames);
+
     Texture2D animTexture = {0, 0, 0, 0, 0};
 
     if (animFrames > 0)
@@ -45,169 +50,311 @@ int main()
             .width = animImage.width,
             .height = animImage.height,
             .mipmaps = 1,
-            .format = animImage.format};
+            .format = animImage.format
+        };
+
         animTexture = LoadTextureFromImage(firstFrame);
     }
-    unsigned int nextFrameDataOffset = 0;
+
     int currentAnimFrame = 0;
     int frameCounter = 0;
     int frameDelay = 8;
-    int colorFlag = 0;
+
+    // Game variables
     bool gameStart = false;
-    Rectangle destRec = {0.0f, 0.0f, 1080.0f, 700.0f};
-    Vector2 origin = {0.0f, 0.0f};
-    SetMusicVolume(bgm1, 0.7f);
-    PlayMusicStream(bgm1);
-    SetTargetFPS(60);
-    while (WindowShouldClose() == false)
+    int colorFlag = 0;
+
+    Rectangle bgSource = {0, 0, 0, 0};
+    Rectangle bgDest = {0, 0, 1080, 700};
+
+    if (animFrames > 0)
+    {
+        bgSource = {
+            0,
+            0,
+            (float)animImage.width,
+            (float)animImage.height
+        };
+    }
+
+    while (!WindowShouldClose())
     {
         UpdateMusicStream(bgm1);
+
+        // Background animation
         frameCounter++;
-        if (frameCounter >= frameDelay)
+
+        if (animFrames > 0 && frameCounter >= frameDelay)
         {
             currentAnimFrame++;
+
             if (currentAnimFrame >= animFrames)
                 currentAnimFrame = 0;
-            int frameSize = animImage.width * animImage.height *
-                            GetPixelDataSize(animImage.width, animImage.height, animImage.format);
 
-            nextFrameDataOffset = frameSize * currentAnimFrame;
+            int frameSize = GetPixelDataSize(
+                animImage.width,
+                animImage.height,
+                animImage.format
+            );
 
-            UpdateTexture(animTexture,
-                          ((unsigned char *)animImage.data) + nextFrameDataOffset);
+            unsigned int nextFrameDataOffset =
+                frameSize * currentAnimFrame;
+
+            UpdateTexture(
+                animTexture,
+                (unsigned char*)animImage.data + nextFrameDataOffset
+            );
 
             frameCounter = 0;
         }
 
         BeginDrawing();
+
+        // INTRO SCREEN
         if (!gameStart)
         {
             if (counter <= 300)
             {
                 ClearBackground(BLACK);
-                DrawText("A GAME BY", 1080 / 2 - 80, 700 / 2 - 50, 30, WHITE);
-                EndDrawing();
+
+                DrawText(
+                    "A GAME BY",
+                    460, 300, 30, WHITE
+                );
+
                 counter++;
+                EndDrawing();
                 continue;
             }
-            if (counter >= 300 && counter <= 600)
+
+            if (counter <= 600)
             {
                 ClearBackground(BLACK);
-                DrawText("Muzamil Hussain", 1080 / 2 - 200, 700 / 2 - 50, 70, YELLOW);
-                EndDrawing();
+
+                DrawText(
+                    "Muzamil Hussain",
+                    340, 300, 60, YELLOW
+                );
+
                 counter++;
+                EndDrawing();
                 continue;
             }
-            ClearBackground(BLUE);
-            // DrawTexture(animTexture, 1080 / 2 - animTexture.width / 2, 700 / 2 - animTexture.height / 2, WHITE);
-            DrawTexturePro(animTexture, (Rectangle){0.0f, 0.0f, (float)animTexture.width, (float)animTexture.height}, destRec, origin, 0.0f, WHITE);
-            // DrawTexture(logotex, 400, 60, WHITE);
-            DrawText("PRESS P TO START", 400, 580, 30, colorFlag % 10 == 0 ? YELLOW : WHITE);
-            if (IsKeyDown(KEY_P))
+
+            // Animated background
+            ClearBackground(BLACK);
+
+            if (animFrames > 0)
+            {
+                DrawTexturePro(
+                    animTexture,
+                    bgSource,
+                    bgDest,
+                    {0, 0},
+                    0,
+                    WHITE
+                );
+            }
+
+            DrawText(
+                "PRESS P TO START",
+                400, 580, 30,
+                colorFlag % 10 == 0 ? YELLOW : WHITE
+            );
+
+            if (IsKeyPressed(KEY_P))
             {
                 gameStart = true;
                 counter = 0;
             }
         }
+
+        // GAME SCREEN
         else
         {
+            // Fight intro
             if (counter <= 200)
             {
                 counter++;
-                ClearBackground(Color{255, 0, 0, 50});
-                DrawText("FIGHT!", 1080 / 2 - 100, 700 / 2 - 50, 50, WHITE);
+
+                ClearBackground(BLACK);
+
+                if (animFrames > 0)
+                {
+                    DrawTexturePro(
+                        animTexture,
+                        bgSource,
+                        bgDest,
+                        {0, 0},
+                        0,
+                        WHITE
+                    );
+                }
+
+                DrawText(
+                    "FIGHT!",
+                    450, 300, 50, WHITE
+                );
+
                 EndDrawing();
                 continue;
             }
-            DrawTexturePro(animTexture, (Rectangle){0.0f, 0.0f, (float)animTexture.width, (float)animTexture.height}, destRec, origin, 0.0f, WHITE);
-            if (IsKeyDown(KEY_D))
+
+            // Draw animated background
+            ClearBackground(BLACK);
+
+            if (animFrames > 0)
             {
-                p1x += 10;
-            }
-            if (IsKeyDown(KEY_A))
-            {
-                p1x -= 10;
-            }
-            if (IsKeyDown(KEY_SPACE))
-            {
-                jumpP1 = true;
+                DrawTexturePro(
+                    animTexture,
+                    bgSource,
+                    bgDest,
+                    {0, 0},
+                    0,
+                    WHITE
+                );
             }
 
+            // NARUTO CONTROLS
+            if (IsKeyDown(KEY_D))
+                p1x += 5;
+
+            if (IsKeyDown(KEY_A))
+                p1x -= 5;
+
+            if (IsKeyPressed(KEY_SPACE) && !jumpP1 && !fallingP1)
+                jumpP1 = true;
+
+            // Naruto jumping
             if (jumpP1)
             {
+                p1y -= 15;
+
                 if (p1y <= 200)
                 {
-                    fallingP1 = true;
                     jumpP1 = false;
-                }
-                else
-                {
-                    p1y -= 20;
+                    fallingP1 = true;
                 }
             }
+
             if (fallingP1)
             {
-                p1y += 50;
+                p1y += 15;
+
                 if (p1y >= 350)
                 {
+                    p1y = 350;
                     fallingP1 = false;
                 }
             }
 
-            if (IsKeyDown(KEY_D) || IsKeyDown(KEY_A))
+            // SASUKE CONTROLS
+            if (IsKeyDown(KEY_RIGHT))
+                p2x += 5;
+
+            if (IsKeyDown(KEY_LEFT))
+                p2x -= 5;
+
+            if (IsKeyPressed(KEY_UP) && !jumpP2 && !fallingP2)
+                jumpP2 = true;
+
+            // Sasuke jumping
+            if (jumpP2)
             {
-                if (i % 10 == 0)
+                p2y -= 15;
+
+                if (p2y <= 200)
                 {
-                    i++;
+                    jumpP2 = false;
+                    fallingP2 = true;
                 }
-                // if(j % 2 == 0){
-                //     DrawTexture(narutoTex1, p1x, p1y, WHITE);
-                // } else {
-                //     DrawTexture(narutoTex2, p1x, p1y, WHITE);
-                // } i++;
             }
-            else if (IsKeyDown(KEY_R))
+
+            if (fallingP2)
             {
-                if (i % 10 == 0)
+                p2y += 15;
+
+                if (p2y >= 350)
                 {
-                    i++;
+                    p2y = 350;
+                    fallingP2 = false;
                 }
-                // if(j % 2 == 0){
-                //     DrawTexture(narutoPunchAttack1, p1x, p1y, WHITE);
-                // } else {
-                //     DrawTexture(narutoPunchAttack2, p1x, p1y, WHITE);
-                // } i++;
             }
-            else if (IsKeyDown(KEY_F))
-            {
-                if (i % 10 == 0)
-                {
-                    i++;
-                }
-                // if(j % 2 == 0){
-                //     DrawTexture(narutoFight1, p1x, p1y, WHITE);
-                // } else {
-                //     DrawTexture(narutoFight2, p1x, p1y, WHITE);
-                // } i++;
-            }
-            else
-            {
-                DrawTexture(narutoTex, p1x, p1y, WHITE);
-                i = 0;
-            }
+
+            // Keep characters inside screen
+            if (p1x < 0) p1x = 0;
+            if (p1x > 1080 - narutoTex.width * playerScale)
+                p1x = 1080 - narutoTex.width * playerScale;
+
+            if (p2x < 0) p2x = 0;
+            if (p2x > 1080 - sasukeTex.width * playerScale)
+                p2x = 1080 - sasukeTex.width * playerScale;
+
+            // Draw Naruto (smaller)
+            Rectangle narutoSource = {
+                0, 0,
+                (float)narutoTex.width,
+                (float)narutoTex.height
+            };
+
+            Rectangle narutoDest = {
+                (float)p1x,
+                (float)p1y,
+                narutoTex.width * playerScale,
+                narutoTex.height * playerScale
+            };
+
+            DrawTexturePro(
+                narutoTex,
+                narutoSource,
+                narutoDest,
+                {0, 0},
+                0,
+                WHITE
+            );
+
+            // Draw Sasuke (second character)
+            Rectangle sasukeSource = {
+                0, 0,
+                (float)sasukeTex.width,
+                (float)sasukeTex.height
+            };
+
+            Rectangle sasukeDest = {
+                (float)p2x,
+                (float)p2y,
+                sasukeTex.width * playerScale,
+                sasukeTex.height * playerScale
+            };
+
+            DrawTexturePro(
+                sasukeTex,
+                sasukeSource,
+                sasukeDest,
+                {0, 0},
+                0,
+                WHITE
+            );
         }
+
         EndDrawing();
+
         if (colorFlag >= 100)
-        {
             colorFlag = 0;
-        }
+
         colorFlag++;
     }
-    UnloadMusicStream(bgm1);
-    // UnloadTexture(logotex);
+
+    // Cleanup
+    UnloadTexture(narutoTex);
+    UnloadTexture(sasukeTex);
     UnloadTexture(animTexture);
-    // UnloadImage(logo);
     UnloadImage(animImage);
+
+    UnloadMusicStream(bgm1);
+
     CloseAudioDevice();
     CloseWindow();
+
+    return 0;
 }
