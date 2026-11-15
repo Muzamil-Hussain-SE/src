@@ -25,15 +25,29 @@ int main()
     // Texture2D narutoFight2 = LoadTextureFromImage(narutoAttack2);
     // Texture2D narutoPunchAttack1 = LoadTextureFromImage(narutoPunch1);
     // Texture2D narutoPunchAttack2 = LoadTextureFromImage(narutoPunch2);
-    
-    int i = 0, j = 1;
+
+    int i = 0;
+    // j = 1;
     int p1x = 50;
     int p1y = 350;
     bool jumpP1 = false;
     bool fallingP1 = false;
-    Image animImage = LoadImageAnim("assets/bg.mp4", &animFrames);
     // Texture2D logotex = LoadTextureFromImage(logo);
-    Texture2D animTexture = LoadTextureFromImage(animImage);
+    // Image animImage = LoadImageAnim("assets/bg.gif", &animFrames);
+    // Texture2D animTexture = LoadTextureFromImage(animImage);
+    Image animImage = LoadImageAnim("assets/bg.gif", &animFrames);
+    Texture2D animTexture = {0, 0, 0, 0, 0};
+
+    if (animFrames > 0)
+    {
+        Image firstFrame = {
+            .data = animImage.data,
+            .width = animImage.width,
+            .height = animImage.height,
+            .mipmaps = 1,
+            .format = animImage.format};
+        animTexture = LoadTextureFromImage(firstFrame);
+    }
     unsigned int nextFrameDataOffset = 0;
     int currentAnimFrame = 0;
     int frameCounter = 0;
@@ -54,10 +68,13 @@ int main()
             currentAnimFrame++;
             if (currentAnimFrame >= animFrames)
                 currentAnimFrame = 0;
-            nextFrameDataOffset = animImage.width * animImage.height * 4 * currentAnimFrame;
+            int frameSize = animImage.width * animImage.height *
+                            GetPixelDataSize(animImage.width, animImage.height, animImage.format);
 
-            // Update the GPU texture with the raw pixel data of the next frame
-            UpdateTexture(animTexture, ((unsigned char *)animImage.data) + nextFrameDataOffset);
+            nextFrameDataOffset = frameSize * currentAnimFrame;
+
+            UpdateTexture(animTexture,
+                          ((unsigned char *)animImage.data) + nextFrameDataOffset);
 
             frameCounter = 0;
         }
@@ -91,70 +108,92 @@ int main()
                 gameStart = true;
                 counter = 0;
             }
-        } else {
-            if(counter <= 200){
+        }
+        else
+        {
+            if (counter <= 200)
+            {
                 counter++;
                 ClearBackground(Color{255, 0, 0, 50});
-                DrawText("FIGHT!", 1080/2 - 100, 700/2 - 50, 50, WHITE);
-                EndDrawing(); continue;
+                DrawText("FIGHT!", 1080 / 2 - 100, 700 / 2 - 50, 50, WHITE);
+                EndDrawing();
+                continue;
             }
             DrawTexturePro(animTexture, (Rectangle){0.0f, 0.0f, (float)animTexture.width, (float)animTexture.height}, destRec, origin, 0.0f, WHITE);
-            if(IsKeyDown(KEY_D)){
-                p1x+=10;
+            if (IsKeyDown(KEY_D))
+            {
+                p1x += 10;
             }
-            if(IsKeyDown(KEY_A)){
-                p1x-=10;
+            if (IsKeyDown(KEY_A))
+            {
+                p1x -= 10;
             }
-            if(IsKeyDown(KEY_SPACE)){
+            if (IsKeyDown(KEY_SPACE))
+            {
                 jumpP1 = true;
             }
 
-            if(jumpP1){
-                if(p1y <= 200){
+            if (jumpP1)
+            {
+                if (p1y <= 200)
+                {
                     fallingP1 = true;
                     jumpP1 = false;
-                } else {
-                    p1y-=20;
-
+                }
+                else
+                {
+                    p1y -= 20;
                 }
             }
-            if(fallingP1){
+            if (fallingP1)
+            {
                 p1y += 50;
-                if(p1y >= 350){
+                if (p1y >= 350)
+                {
                     fallingP1 = false;
                 }
             }
-            
-            if(IsKeyDown(KEY_D) || IsKeyDown(KEY_A)){
-                if(i%10 == 0){
-                    j++;
+
+            if (IsKeyDown(KEY_D) || IsKeyDown(KEY_A))
+            {
+                if (i % 10 == 0)
+                {
+                    i++;
                 }
                 // if(j % 2 == 0){
                 //     DrawTexture(narutoTex1, p1x, p1y, WHITE);
                 // } else {
                 //     DrawTexture(narutoTex2, p1x, p1y, WHITE);
                 // } i++;
-            } else if(IsKeyDown(KEY_R)){
-                if(i%10 == 0){
-                    j++;
+            }
+            else if (IsKeyDown(KEY_R))
+            {
+                if (i % 10 == 0)
+                {
+                    i++;
                 }
                 // if(j % 2 == 0){
                 //     DrawTexture(narutoPunchAttack1, p1x, p1y, WHITE);
                 // } else {
                 //     DrawTexture(narutoPunchAttack2, p1x, p1y, WHITE);
                 // } i++;
-            } else if(IsKeyDown(KEY_F)){
-                if(i%10 == 0){
-                    j++;
+            }
+            else if (IsKeyDown(KEY_F))
+            {
+                if (i % 10 == 0)
+                {
+                    i++;
                 }
                 // if(j % 2 == 0){
                 //     DrawTexture(narutoFight1, p1x, p1y, WHITE);
                 // } else {
                 //     DrawTexture(narutoFight2, p1x, p1y, WHITE);
                 // } i++;
-            } else {
+            }
+            else
+            {
                 DrawTexture(narutoTex, p1x, p1y, WHITE);
-                i = 0; j = 0;
+                i = 0;
             }
         }
         EndDrawing();
