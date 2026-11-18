@@ -16,19 +16,21 @@ int main()
     PlayMusicStream(bgm1);
 
     // Load characters
-    Texture2D narutoTex = LoadTexture("../assets/naruto.png");
-    Texture2D sasukeTex = LoadTexture("../assets/madara.png");
+    Texture2D narutoTex = LoadTexture("../assets/mc.png");
+    Texture2D madaraTex = LoadTexture("../assets/madara.jpg");
+    Texture2D narutoAttack = LoadTexture("../assets/rasengan.png");
+    bool showRasengan = false;
 
     // Player 1: Naruto
     int p1x = 50;
-    int p1y = 350;
+    int p1y = 250;
 
-    // Player 2: Sasuke
+    // Player 2: madara
     int p2x = 850;
-    int p2y = 350;
+    int p2y = 250;
 
     // Character sizes
-    float playerScale = 0.30f;
+    float playerScale = 0.3f;
 
     // Jump variables
     bool jumpP1 = false;
@@ -50,8 +52,7 @@ int main()
             .width = animImage.width,
             .height = animImage.height,
             .mipmaps = 1,
-            .format = animImage.format
-        };
+            .format = animImage.format};
 
         animTexture = LoadTextureFromImage(firstFrame);
     }
@@ -73,8 +74,7 @@ int main()
             0,
             0,
             (float)animImage.width,
-            (float)animImage.height
-        };
+            (float)animImage.height};
     }
 
     while (!WindowShouldClose())
@@ -94,16 +94,14 @@ int main()
             int frameSize = GetPixelDataSize(
                 animImage.width,
                 animImage.height,
-                animImage.format
-            );
+                animImage.format);
 
             unsigned int nextFrameDataOffset =
                 frameSize * currentAnimFrame;
 
             UpdateTexture(
                 animTexture,
-                (unsigned char*)animImage.data + nextFrameDataOffset
-            );
+                (unsigned char *)animImage.data + nextFrameDataOffset);
 
             frameCounter = 0;
         }
@@ -119,8 +117,7 @@ int main()
 
                 DrawText(
                     "A GAME BY",
-                    460, 300, 30, WHITE
-                );
+                    460, 300, 30, WHITE);
 
                 counter++;
                 EndDrawing();
@@ -133,8 +130,7 @@ int main()
 
                 DrawText(
                     "Muzamil Hussain",
-                    340, 300, 60, YELLOW
-                );
+                    340, 300, 60, YELLOW);
 
                 counter++;
                 EndDrawing();
@@ -152,15 +148,13 @@ int main()
                     bgDest,
                     {0, 0},
                     0,
-                    WHITE
-                );
+                    WHITE);
             }
 
             DrawText(
                 "PRESS P TO START",
                 400, 580, 30,
-                colorFlag % 10 == 0 ? YELLOW : WHITE
-            );
+                colorFlag % 10 == 0 ? YELLOW : WHITE);
 
             if (IsKeyPressed(KEY_P))
             {
@@ -187,14 +181,12 @@ int main()
                         bgDest,
                         {0, 0},
                         0,
-                        WHITE
-                    );
+                        WHITE);
                 }
 
                 DrawText(
                     "FIGHT!",
-                    450, 300, 50, WHITE
-                );
+                    450, 300, 50, WHITE);
 
                 EndDrawing();
                 continue;
@@ -211,8 +203,7 @@ int main()
                     bgDest,
                     {0, 0},
                     0,
-                    WHITE
-                );
+                    WHITE);
             }
 
             // NARUTO CONTROLS
@@ -224,6 +215,15 @@ int main()
 
             if (IsKeyPressed(KEY_SPACE) && !jumpP1 && !fallingP1)
                 jumpP1 = true;
+            if (IsKeyPressed(KEY_F))
+                showRasengan = true;
+
+            if (showRasengan)
+            {
+                BeginDrawing();
+                DrawTexture(narutoAttack, 400, 300, WHITE);
+                EndDrawing();
+            }
 
             // Naruto jumping
             if (jumpP1)
@@ -248,7 +248,7 @@ int main()
                 }
             }
 
-            // SASUKE CONTROLS
+            // madara CONTROLS
             if (IsKeyDown(KEY_RIGHT))
                 p2x += 5;
 
@@ -258,7 +258,7 @@ int main()
             if (IsKeyPressed(KEY_UP) && !jumpP2 && !fallingP2)
                 jumpP2 = true;
 
-            // Sasuke jumping
+            // madara jumping
             if (jumpP2)
             {
                 p2y -= 15;
@@ -282,27 +282,27 @@ int main()
             }
 
             // Keep characters inside screen
-            if (p1x < 0) p1x = 0;
+            if (p1x < 0)
+                p1x = 0;
             if (p1x > 1080 - narutoTex.width * playerScale)
                 p1x = 1080 - narutoTex.width * playerScale;
 
-            if (p2x < 0) p2x = 0;
-            if (p2x > 1080 - sasukeTex.width * playerScale)
-                p2x = 1080 - sasukeTex.width * playerScale;
+            if (p2x < 0)
+                p2x = 0;
+            if (p2x > 1080 - madaraTex.width * playerScale)
+                p2x = 1080 - madaraTex.width * playerScale;
 
             // Draw Naruto (smaller)
             Rectangle narutoSource = {
                 0, 0,
                 (float)narutoTex.width,
-                (float)narutoTex.height
-            };
+                (float)narutoTex.height};
 
             Rectangle narutoDest = {
                 (float)p1x,
                 (float)p1y,
                 narutoTex.width * playerScale,
-                narutoTex.height * playerScale
-            };
+                narutoTex.height * playerScale};
 
             DrawTexturePro(
                 narutoTex,
@@ -310,31 +310,27 @@ int main()
                 narutoDest,
                 {0, 0},
                 0,
-                WHITE
-            );
+                WHITE);
 
-            // Draw Sasuke (second character)
-            Rectangle sasukeSource = {
+            // Draw madara (second character)
+            Rectangle madaraSource = {
                 0, 0,
-                (float)sasukeTex.width,
-                (float)sasukeTex.height
-            };
+                (float)madaraTex.width,
+                (float)madaraTex.height};
 
-            Rectangle sasukeDest = {
+            Rectangle madaraDest = {
                 (float)p2x,
                 (float)p2y,
-                sasukeTex.width * playerScale,
-                sasukeTex.height * playerScale
-            };
+                madaraTex.width * playerScale,
+                madaraTex.height * playerScale};
 
             DrawTexturePro(
-                sasukeTex,
-                sasukeSource,
-                sasukeDest,
+                madaraTex,
+                madaraSource,
+                madaraDest,
                 {0, 0},
                 0,
-                WHITE
-            );
+                WHITE);
         }
 
         EndDrawing();
@@ -347,9 +343,10 @@ int main()
 
     // Cleanup
     UnloadTexture(narutoTex);
-    UnloadTexture(sasukeTex);
+    UnloadTexture(madaraTex);
     UnloadTexture(animTexture);
     UnloadImage(animImage);
+    UnloadTexture(narutoAttack);
 
     UnloadMusicStream(bgm1);
 
