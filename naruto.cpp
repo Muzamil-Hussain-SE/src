@@ -6,7 +6,7 @@ int main()
 {
     int counter = 0;
 
-    InitWindow(1080, 700, "ShooterCpp");
+    InitWindow(1080, 700, "NinjaWarsCpp");
     InitAudioDevice();
     SetTargetFPS(60);
 
@@ -16,9 +16,10 @@ int main()
     PlayMusicStream(bgm1);
 
     // Load characters
-    Texture2D narutoTex = LoadTexture("../assets/mc.png");
-    Texture2D madaraTex = LoadTexture("../assets/madara.jpg");
+    Texture2D narutoTex = LoadTexture("../assets/idle.png");
+    Texture2D madaraTex = LoadTexture("../assets/madaraidle.png");
     Texture2D narutoAttack = LoadTexture("../assets/rasengan.png");
+
     bool showRasengan = false;
 
     // Player 1: Naruto
@@ -41,7 +42,14 @@ int main()
 
     // Animated background
     int animFrames = 0;
-    Image animImage = LoadImageAnim("../assets/bg.gif", &animFrames);
+    Image animImage = LoadImageAnim("../assets/bg2.gif", &animFrames);
+    cout << "Naruto ID: " << narutoTex.id << endl;
+    cout << "Naruto Width: " << narutoTex.width << endl;
+    cout << "Naruto Height: " << narutoTex.height << endl;
+
+    cout << "Madara ID: " << madaraTex.id << endl;
+    cout << "Madara Width: " << madaraTex.width << endl;
+    cout << "Madara Height: " << madaraTex.height << endl;
 
     Texture2D animTexture = {0, 0, 0, 0, 0};
 
